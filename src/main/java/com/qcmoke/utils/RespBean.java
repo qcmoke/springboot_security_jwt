@@ -11,7 +11,7 @@ public class RespBean {
     }
 
 
-    public static RespBean ok(String msg, Object obj) {
+    public static  RespBean ok(String msg, Object obj) {
         return new RespBean(HttpStatus.OK.value(), msg, obj);
     }
 
