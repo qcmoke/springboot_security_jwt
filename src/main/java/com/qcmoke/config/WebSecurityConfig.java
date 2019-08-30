@@ -41,6 +41,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     JwtAccessDeniedHandler jwtAccessDeniedHandler;
     @Autowired
     EntryPointUnauthorizedHandler entryPointUnauthorizedHandler;
+    @Autowired
+    JwtAuthorizationFilter jwtAuthorizationFilter;
 
 
     @Bean
@@ -87,11 +89,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 /**
                  * 静态授权的请求
                  */
-               /*
-                在使用数据库动态设置授权的请求后，这些静态授权的请求就会由于自定义CustomMetadataSource而失效
-                .antMatchers("/test").hasRole("admin")
-                .antMatchers("/test2").hasRole("admin")
-                */
+                /*
+                 在使用数据库动态设置授权的请求后，这些静态授权的请求就会由于自定义CustomMetadataSource而失效
+                 .antMatchers("/test").hasRole("admin")
+                 .antMatchers("/test2").hasRole("admin")
+                 */
                 /**
                  * 通过数据库动态设置授权的请求
                  */
@@ -124,7 +126,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 //.addFilterAfter(new JwtAuthenticationFilter("/login", authenticationManager()), SecurityContextPersistenceFilter.class) //可以用这个过滤器来取代登录认证成功和失败的Handler
-                .addFilterAfter(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)//在授权之前给springsecurity注入请求中token的用户名和角色(权限)等信息
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)//在授权之前给springsecurity注入请求中token的用户名和角色(权限)等信息
                 /*关闭csrf*/
                 .csrf().disable()
                 //禁用session(否则使用token验证没有意义)，不创建session会话，不会返回sessionid给客户端

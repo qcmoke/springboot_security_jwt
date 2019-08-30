@@ -18,19 +18,18 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
     @Override
     public void onAuthenticationFailure(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
         RespBean respBean = null;
-        if (e instanceof BadCredentialsException ||
-                e instanceof UsernameNotFoundException) {
-            respBean = RespBean.error("账户名或者密码输入错误!");
+        if (e instanceof BadCredentialsException || e instanceof UsernameNotFoundException) {
+            respBean = RespBean.unauthorized("账户名或者密码输入错误!");
         } else if (e instanceof LockedException) {
-            respBean = RespBean.error("账户被锁定，请联系管理员!");
+            respBean = RespBean.unauthorized("账户被锁定，请联系管理员!");
         } else if (e instanceof CredentialsExpiredException) {
-            respBean = RespBean.error("密码过期，请联系管理员!");
+            respBean = RespBean.unauthorized("密码过期，请联系管理员!");
         } else if (e instanceof AccountExpiredException) {
-            respBean = RespBean.error("账户过期，请联系管理员!");
+            respBean = RespBean.unauthorized("账户过期，请联系管理员!");
         } else if (e instanceof DisabledException) {
-            respBean = RespBean.error("账户被禁用，请联系管理员!");
+            respBean = RespBean.unauthorized("账户被禁用，请联系管理员!");
         } else {
-            respBean = RespBean.error("登录失败!");
+            respBean = RespBean.unauthorized("登录失败!");
         }
         ResponseWriterUtil.writeJson(respBean);
     }
