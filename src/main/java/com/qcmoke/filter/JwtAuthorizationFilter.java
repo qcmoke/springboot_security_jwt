@@ -87,7 +87,7 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
         //不管是不是本人的token，只要验证token正确都可通过，如果不是本人的token也不用担心，放行后让springsecurity自己来拦截即可。
         filterChain.doFilter(request, servletResponse);
 
-        //处理完请和相应后清空当前用户的权限上下文
+        //处理完请求和相应后清空当前用户的权限上下文
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 }
