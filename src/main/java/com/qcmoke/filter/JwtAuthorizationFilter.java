@@ -63,7 +63,7 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
             }
         } else {
             //如果token为null，那么不会执行SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            //所以springsecurity会认为当前请求的用户为登录认证，所以会重定向到登录页面(login_p)。
+            //所以springsecurity会认为当前请求的用户未登录认证，所以会重定向到登录页面(login_p)。
             //这里为了方便直接处理返回给客户端
             ResponseWriterUtil.writeJson(RespBean.unauthorized("请登录认证完成再请求该接口！"));
             //filterChain.doFilter(request, servletResponse);//如果放行的话，则需要提供不受springsecurity拦截的接口来处理（可以使用Controller）。
