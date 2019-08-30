@@ -38,6 +38,10 @@ public class RespBean {
         return new RespBean(HttpStatus.UNAUTHORIZED.value(), msg, null);
     }
 
+    public static RespBean forbidden(String msg) {
+        return new RespBean(HttpStatus.FORBIDDEN.value(), msg, null);
+    }
+
 
     private RespBean() {
     }

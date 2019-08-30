@@ -1,6 +1,7 @@
 package com.qcmoke.config;
 
 import com.qcmoke.filter.JwtAuthorizationFilter;
+import com.qcmoke.handler.EntryPointUnauthorizedHandler;
 import com.qcmoke.handler.JwtAccessDeniedHandler;
 import com.qcmoke.handler.JwtAuthenticationFailureHandler;
 import com.qcmoke.handler.JwtAuthenticationSuccessHandler;
@@ -38,6 +39,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
     @Autowired
     JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    @Autowired
+    EntryPointUnauthorizedHandler entryPointUnauthorizedHandler;
 
 
     @Bean
@@ -129,6 +132,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 /*无权限访问异常处理*/
-                .exceptionHandling().accessDeniedHandler(jwtAccessDeniedHandler);
+                .exceptionHandling()
+                .accessDeniedHandler(jwtAccessDeniedHandler)//用来解决认证过的用户访问无权限资源时的异常
+                .authenticationEntryPoint(entryPointUnauthorizedHandler);//用来解决匿名用户(即为登录认证)访问无权限资源时的异常
     }
 }

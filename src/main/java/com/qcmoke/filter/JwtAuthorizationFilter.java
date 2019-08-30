@@ -3,16 +3,13 @@ package com.qcmoke.filter;
 import com.qcmoke.utils.JwtUtil;
 import com.qcmoke.utils.RespBean;
 import com.qcmoke.utils.ResponseWriterUtil;
-import com.qcmoke.utils.SpringSecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -37,23 +34,24 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-        String[] ignoreUris = SpringSecurityUtil.getIgnoreUris();
-        String[] openUris = SpringSecurityUtil.getOpenUris();
-        String[] uris = ArrayUtils.addAll(ignoreUris, openUris);//合并数组
-        String requestURI = request.getRequestURI();
-
-        for (String uri : uris) {
-            //如果是被忽略的请求那么放行
-            //如果只需要放行登录请求/login,那么可以通过配置JwtAuthorizationFilter过滤器的顺序到UsernamePasswordAuthenticationFilter之后来防止JwtAuthorizationFilter拦截/login
-            if (new AntPathMatcher().matchStart(uri,requestURI )) {
-                filterChain.doFilter(request, servletResponse);
-                return;
-            }
-        }
+//        String[] ignoreUris = SpringSecurityUtil.getIgnoreUris();
+//        String[] openUris = SpringSecurityUtil.getOpenUris();
+//        String[] uris = ArrayUtils.addAll(ignoreUris, openUris);//合并数组
+//        String requestURI = request.getRequestURI();
+//
+//        for (String uri : uris) {
+//            //如果是被忽略的请求那么放行
+//            //如果只需要放行登录请求/login,那么可以通过配置JwtAuthorizationFilter过滤器的顺序到UsernamePasswordAuthenticationFilter之后来防止JwtAuthorizationFilter拦截/login
+//            if (new AntPathMatcher().matchStart(uri, requestURI)) {
+//                filterChain.doFilter(request, servletResponse);
+//                return;
+//            }
+//        }
 
 
         String jwtToken = request.getHeader(JwtUtil.REQUEST_TOKEN_NAME);
-        if (StringUtils.isNotBlank(jwtToken)) {
+        //如果解析 token 成功并且本次会话的权限还未被写入
+        if (StringUtils.isNotBlank(jwtToken) && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) JwtUtil.getAuthentication(jwtToken);
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);//SecurityContextHolder利用了一个SecurityContextHolderStrategy(具体实现org.springframework.security.core.context.ThreadLocalSecurityContextHolderStrategy)（存储策略）进行上下文的存储，而ThreadLocalSecurityContextHolderStrategy通过ThreadLocal为每个线程开辟一个存储区域（即SecurityContext安全上下文），来存储相应的对象。
@@ -78,9 +76,8 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
         } else {
             //如果token为null，那么不会执行SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             //所以springsecurity会认为当前请求的用户未登录认证，所以会重定向到登录页面(login_p)。
-            //这里为了方便直接处理返回给客户端
-            ResponseWriterUtil.writeJson(RespBean.unauthorized("请登录认证完成再请求该接口！"));
-            //filterChain.doFilter(request, servletResponse);//如果放行的话，则需要提供不受springsecurity拦截的接口来处理（可以使用Controller）。
+            filterChain.doFilter(request, servletResponse);//如果放行的话，则需要提供AuthenticationEntryPoint来处理为登录认证的异常
+            //ResponseWriterUtil.writeJson(RespBean.unauthorized("请登录认证完成再请求该接口！"));//这里也可以直接处理返回给客户端，但要在过滤器中放行ignore url
             return;
 
         }
