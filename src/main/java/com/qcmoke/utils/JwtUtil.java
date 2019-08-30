@@ -16,12 +16,16 @@ import java.util.List;
 @SuppressWarnings("all")
 public class JwtUtil {
 
-    public static final String RESPONSE_HEADER_TOKEN_NAME = "Authorization";
-    public static final String TOKEN_PREFIX = "Bearer ";
-
+    //请求体token名称
     public static final String REQUEST_TOKEN_NAME = "authorization";
 
-    //用户角色
+    //响应体token名称
+    public static final String RESPONSE_HEADER_TOKEN_NAME = "Authorization";
+    //token字符串前缀
+    public static final String TOKEN_PREFIX = "Bearer ";
+
+
+    //token自定义的属性
     public static final String AUTHORITIES_NAME = "authorities";
 
 
