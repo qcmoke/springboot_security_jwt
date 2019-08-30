@@ -1,5 +1,7 @@
 package com.qcmoke.utils;
 
+import org.springframework.http.HttpStatus;
+
 public class RespBean {
     private Integer status;
     private String msg;
@@ -8,24 +10,26 @@ public class RespBean {
     private RespBean() {
     }
 
-    public static RespBean build() {
-        return new RespBean();
-    }
 
     public static RespBean ok(String msg, Object obj) {
-        return new RespBean(200, msg, obj);
+        return new RespBean(HttpStatus.OK.value(), msg, obj);
     }
 
     public static RespBean ok(String msg) {
-        return new RespBean(200, msg, null);
+        return new RespBean(HttpStatus.OK.value(), msg, null);
     }
 
     public static RespBean error(String msg, Object obj) {
-        return new RespBean(500, msg, obj);
+        return new RespBean(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg, obj);
     }
 
     public static RespBean error(String msg) {
-        return new RespBean(500, msg, null);
+        return new RespBean(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg, null);
+    }
+
+
+    public static RespBean unauthorized(String msg) {
+        return new RespBean(HttpStatus.UNAUTHORIZED.value(), msg, null);
     }
 
     private RespBean(Integer status, String msg, Object obj) {
@@ -35,7 +39,6 @@ public class RespBean {
     }
 
     public Integer getStatus() {
-
         return status;
     }
 
