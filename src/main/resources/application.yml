@@ -1,0 +1,3 @@
+security:
+  ignore-uris: /static/**,/favicon.ico,/*.html,/login_p,/error
+  open-uris: /login

@@ -1,5 +1,6 @@
 package com.qcmoke.service;
 
+import com.qcmoke.entity.Role;
 import com.qcmoke.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,16 +15,18 @@ public class SysUserDetailsService implements UserDetailsService {
 
     private static final List<User> userList = new ArrayList<>();
 
-
     /**
      * 假设为数据库数据
      */
     static {
-        List<String> adminRoles = new ArrayList<>();
-        adminRoles.add("ROLE_admin");
+        Role user = new Role(1L, "ROLE_user", "ROLE_user");
+        Role admin = new Role(2L, "ROLE_admin", "ROLE_admin");
+
+        List<Role> adminRoles = new ArrayList<>();
+        adminRoles.add(admin);
         userList.add(new User("admin", "123", adminRoles));
-        List<String> sangRoles = new ArrayList<>();
-        sangRoles.add("ROLE_user");
+        List<Role> sangRoles = new ArrayList<>();
+        sangRoles.add(user);
         userList.add(new User("sang", "456", sangRoles));
     }
 

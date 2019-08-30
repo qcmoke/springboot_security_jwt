@@ -92,7 +92,7 @@ public class JwtUtil {
      * 返回Authentication对象
      *
      * @param token
-     * @return
+     * @return UsernamePasswordAuthenticationToken
      * @throws ExpiredJwtException
      * @throws UnsupportedJwtException
      * @throws MalformedJwtException

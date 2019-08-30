@@ -7,24 +7,30 @@ public class RespBean {
     private String msg;
     private Object obj;
 
-    private RespBean() {
-    }
-
-
-    public static  RespBean ok(String msg, Object obj) {
+    public static RespBean ok(String msg, Object obj) {
         return new RespBean(HttpStatus.OK.value(), msg, obj);
     }
 
-    public static RespBean ok(String msg) {
-        return new RespBean(HttpStatus.OK.value(), msg, null);
+
+    public static RespBean ok(Object obj) {
+        return ok(null, obj);
     }
 
-    public static RespBean error(String msg, Object obj) {
-        return new RespBean(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg, obj);
+    public static RespBean ok(String msg) {
+        return ok(msg, null);
     }
+
+    public static RespBean ok() {
+        return ok(null, null);
+    }
+
 
     public static RespBean error(String msg) {
         return new RespBean(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg, null);
+    }
+
+    public static RespBean error() {
+        return new RespBean(HttpStatus.INTERNAL_SERVER_ERROR.value(), null, null);
     }
 
 
@@ -32,11 +38,16 @@ public class RespBean {
         return new RespBean(HttpStatus.UNAUTHORIZED.value(), msg, null);
     }
 
+
+    private RespBean() {
+    }
+
     private RespBean(Integer status, String msg, Object obj) {
         this.status = status;
         this.msg = msg;
         this.obj = obj;
     }
+
 
     public Integer getStatus() {
         return status;

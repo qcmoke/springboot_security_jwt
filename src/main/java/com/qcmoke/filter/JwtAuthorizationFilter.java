@@ -3,13 +3,16 @@ package com.qcmoke.filter;
 import com.qcmoke.utils.JwtUtil;
 import com.qcmoke.utils.RespBean;
 import com.qcmoke.utils.ResponseWriterUtil;
+import com.qcmoke.utils.SpringSecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.servlet.FilterChain;
@@ -33,11 +36,22 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-//        String requestURI = request.getRequestURI();
-//        if (StringUtils.contains(requestURI, "/login")) {
-//            filterChain.doFilter(request, servletResponse);
-//            return;
-//        }
+
+        String[] ignoreUris = SpringSecurityUtil.getIgnoreUris();
+        String[] openUris = SpringSecurityUtil.getOpenUris();
+        String[] uris = ArrayUtils.addAll(ignoreUris, openUris);//合并数组
+        String requestURI = request.getRequestURI();
+
+        for (String uri : uris) {
+            //如果是被忽略的请求那么放行
+            //如果只需要放行登录请求/login,那么可以通过配置JwtAuthorizationFilter过滤器的顺序到UsernamePasswordAuthenticationFilter之后来防止JwtAuthorizationFilter拦截/login
+            if (new AntPathMatcher().matchStart(uri,requestURI )) {
+                filterChain.doFilter(request, servletResponse);
+                return;
+            }
+        }
+
+
         String jwtToken = request.getHeader(JwtUtil.REQUEST_TOKEN_NAME);
         if (StringUtils.isNotBlank(jwtToken)) {
             try {
@@ -68,6 +82,7 @@ public class JwtAuthorizationFilter extends GenericFilterBean {
             ResponseWriterUtil.writeJson(RespBean.unauthorized("请登录认证完成再请求该接口！"));
             //filterChain.doFilter(request, servletResponse);//如果放行的话，则需要提供不受springsecurity拦截的接口来处理（可以使用Controller）。
             return;
+
         }
         //不管是不是本人的token，只要验证token正确都可通过，如果不是本人的token也不用担心，放行后让springsecurity自己来拦截即可。
         filterChain.doFilter(request, servletResponse);

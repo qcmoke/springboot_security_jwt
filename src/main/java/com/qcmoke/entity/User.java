@@ -14,24 +14,23 @@ public class User implements UserDetails {
     private String username;
     @JsonIgnore
     private String password;
-    private List<String> roles;
-    private List<GrantedAuthority> authorities;
+    private List<Role> roles;//用来描述当前用户的角色
 
     public User() {
     }
 
-    public User(String username, String password, List<String> roles) {
+    public User(String username, String password, List<Role> roles) {
         this.username = username;
         this.password = password;
         this.roles = roles;
     }
 
-
-    public List<String> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 
@@ -72,19 +71,14 @@ public class User implements UserDetails {
     }
 
 
-    public void setAuthorities(List<GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
-
-
     /**
      * 获取当前用户所具有的角色
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role));
+        for (Role role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         return authorities;
     }
