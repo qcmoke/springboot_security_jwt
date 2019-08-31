@@ -13,22 +13,30 @@ import java.util.List;
 @Service
 public class SysUserDetailsService implements UserDetailsService {
 
-    private static final List<User> userList = new ArrayList<>();
+    private static final ThreadLocal<List<User>> userListLocal = new ThreadLocal<>();
+
+
+    private void initUserListLocal() {
+        userListLocal.set(new ArrayList<>());
+    }
 
     /**
      * 假设为数据库数据
      */
-    static {
-        Role user = new Role(1L, "ROLE_user", "ROLE_user");
+    private void initData() {
+        Role userRole = new Role(1L, "ROLE_user", "ROLE_user");
         Role admin = new Role(2L, "ROLE_admin", "ROLE_admin");
 
         List<Role> adminRoles = new ArrayList<>();
         adminRoles.add(admin);
+        List<User> userList = userListLocal.get();
         userList.add(new User("admin", "123", adminRoles));
         List<Role> sangRoles = new ArrayList<>();
-        sangRoles.add(user);
+        sangRoles.add(userRole);
         userList.add(new User("sang", "456", sangRoles));
+
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -41,7 +49,9 @@ public class SysUserDetailsService implements UserDetailsService {
 
 
     private User findUserbyUserName(String username) {
-        for (User user : userList) {
+        initUserListLocal();
+        initData();
+        for (User user : userListLocal.get()) {
             if (user.getUsername().equals(username)) {
                 return user;
             }

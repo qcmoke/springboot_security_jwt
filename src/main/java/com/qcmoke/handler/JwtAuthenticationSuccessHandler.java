@@ -3,7 +3,6 @@ package com.qcmoke.handler;
 import com.qcmoke.utils.JwtUtil;
 import com.qcmoke.utils.RespBean;
 import com.qcmoke.utils.ResponseWriterUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -22,6 +21,7 @@ public class JwtAuthenticationSuccessHandler implements AuthenticationSuccessHan
             ResponseWriterUtil.writeJson(RespBean.error("登录认证失败"));
         }
         response.addHeader(JwtUtil.RESPONSE_HEADER_TOKEN_NAME, JwtUtil.TOKEN_PREFIX + jwtToken);
-        ResponseWriterUtil.writeJson(response, HttpStatus.OK.value(), RespBean.ok("认证成功", authentication));
+//        ResponseWriterUtil.writeJson(response, HttpStatus.OK.value(), RespBean.ok("认证成功", authentication));
+        ResponseWriterUtil.writeJson(RespBean.ok("认证成功", authentication));
     }
 }
