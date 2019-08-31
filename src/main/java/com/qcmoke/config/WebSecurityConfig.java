@@ -1,13 +1,8 @@
 package com.qcmoke.config;
 
 import com.qcmoke.filter.JwtAuthorizationFilter;
-import com.qcmoke.handler.EntryPointUnauthorizedHandler;
-import com.qcmoke.handler.JwtAccessDeniedHandler;
-import com.qcmoke.handler.JwtAuthenticationFailureHandler;
-import com.qcmoke.handler.JwtAuthenticationSuccessHandler;
+import com.qcmoke.handler.*;
 import com.qcmoke.service.SysUserDetailsService;
-import com.qcmoke.utils.RespBean;
-import com.qcmoke.utils.ResponseWriterUtil;
 import com.qcmoke.utils.SpringSecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +38,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     EntryPointUnauthorizedHandler entryPointUnauthorizedHandler;
     @Autowired
     JwtAuthorizationFilter jwtAuthorizationFilter;
+    @Autowired
+    JwtLogoutHandler jwtLogoutHandler;
 
 
     @Bean
@@ -120,9 +117,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    ResponseWriterUtil.writeJson(RespBean.ok("注销成功!"));
-                }).permitAll()
+                .logoutSuccessHandler(jwtLogoutHandler)
+                .permitAll()
 
                 .and()
                 //.addFilterAfter(new JwtAuthenticationFilter("/login", authenticationManager()), SecurityContextPersistenceFilter.class) //可以用这个过滤器来取代登录认证成功和失败的Handler
